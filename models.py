@@ -55,7 +55,7 @@ class Comment(_database.Base):
     accepted = _sql.Column(_sql.Boolean, default=False)
     date = _sql.Column(_sql.DateTime, default=_dt.datetime.utcnow())
     user_id = _sql.Column(_sql.String, _sql.ForeignKey("users.id"))
-    article_id = _sql.Column(_sql.String, _sql.ForeignKey("article.id"))
+    article_id = _sql.Column(_sql.String, _sql.ForeignKey("articles.id"))
 
     article = _orm.relationship("Article", back_populates="article")
     user = _orm.relationship("User", back_populates="user")
