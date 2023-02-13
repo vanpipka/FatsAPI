@@ -15,8 +15,8 @@ class User(_database.Base):
     hashed_password = _sql.Column(_sql.String)
     is_active = _sql.Column(_sql.Boolean, default=True)
 
-    articles = _orm.relationship("Article", back_populates="owner")
-    comments = _orm.relationship("Comment", back_populates="owner")
+    articles = _orm.relationship("Article", back_populates="user")
+    comments = _orm.relationship("Comment", back_populates="user")
 
 
 class Category(_database.Base):
@@ -28,6 +28,8 @@ class Category(_database.Base):
     count = _sql.Column(_sql.Integer)
     description = _sql.Column(_sql.String, index=True)
     url = _sql.Column(_sql.String, index=True)
+
+    articles = _orm.relationship("Article", back_populates="category")
 
 
 class Article(_database.Base):
@@ -43,8 +45,9 @@ class Article(_database.Base):
     user_id = _sql.Column(_sql.String, _sql.ForeignKey("users.id"))
     category_id = _sql.Column(_sql.String, _sql.ForeignKey("category.id"))
 
-    category = _orm.relationship("Category", back_populates="article")
-    user = _orm.relationship("User", back_populates="article")
+    category = _orm.relationship("Category", back_populates="articles")
+    user = _orm.relationship("User", back_populates="articles")
+    comments = _orm.relationship("Comment", back_populates="article")
 
 
 class Comment(_database.Base):
@@ -55,7 +58,8 @@ class Comment(_database.Base):
     accepted = _sql.Column(_sql.Boolean, default=False)
     date = _sql.Column(_sql.DateTime, default=_dt.datetime.utcnow())
     user_id = _sql.Column(_sql.String, _sql.ForeignKey("users.id"))
+    user_id = _sql.Column(_sql.String, _sql.ForeignKey("users.id"))
     article_id = _sql.Column(_sql.String, _sql.ForeignKey("articles.id"))
 
-    article = _orm.relationship("Article", back_populates="article")
-    user = _orm.relationship("User", back_populates="user")
+    article = _orm.relationship("Article", back_populates="comments")
+    user = _orm.relationship("User", back_populates="comments")

@@ -51,4 +51,7 @@ class UserCreate(_UserBase):
 class User(_UserBase):
     id: int
     is_active: bool
-    articles: List[Article]
+    articles: List[Article] = []
+
+    class Config:
+        orm_mode = True
