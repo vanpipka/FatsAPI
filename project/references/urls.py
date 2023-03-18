@@ -59,38 +59,22 @@ def create_vessel(vessel: schemas.VesselCreate, db: Session = Depends(get_db_ses
     return services.create_vessel(db=db, vessel=vessel)
 
 
-"""
-@app.get("/users/{user_id}/containers/", response_model=List[_schemas.Container])
-def read_user_containers(
-    user_id: int,
-    db: _orm.Session = _fastapi.Depends(_services.get_db),
-):
-    db_user = _services.get_user(db=db, user_id=user_id)
-    if db_user is None:
-        raise _fastapi.HTTPException(
-            status_code=404, detail="sorry this user does not exist"
-        )
-
-    return _services.get_containers_by_user(db=db, user=db_user)
-
-
-@app.get("/containers/", response_model=List[_schemas.Container])
-def read_containers(
+@references_router.get("/vessels/", response_model=List[schemas.Vessel])
+def read_vessels(
         skip: int = 0,
         limit: int = 10,
-        db: _orm.Session = _fastapi.Depends(_services.get_db)):
-    containers = _services.get_containers(db=db, skip=skip, limit=limit)
+        db: Session = Depends(get_db_session)):
+    vessels = services.get_vessels(db=db, skip=skip, limit=limit)
 
-    return containers
+    return vessels
 
 
-@app.get("/containers/{container_id}", response_model=_schemas.Container)
-def read_containers(container_id: int, db: _orm.Session = _fastapi.Depends(_services.get_db)):
-    db_container = _services.get_container(db=db, container_id=container_id)
-    if db_container is None:
-        raise _fastapi.HTTPException(
-            status_code=404, detail="sorry this user does not exist"
+@references_router.get("/vessels/{vessel_id}", response_model=schemas.Vessel)
+def read_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
+    db_vessel = services.get_vessel(db=db, vessel_id=vessel_id)
+    if db_vessel is None:
+        raise HTTPException(
+            status_code=404, detail="sorry this vessel does not exists"
         )
-    return db_container
-    
-"""
+    return db_vessel
+

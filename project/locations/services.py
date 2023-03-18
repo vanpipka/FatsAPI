@@ -4,7 +4,7 @@ from . import models, schemas
 
 
 def get_coordinates_for_vessel(db: Session, vessel_id: int):
-    return db.query(models.Coordinate).filter(vessel_id=vessel_id).all()
+    return db.query(models.Coordinate).filter(models.Coordinate.vessel_id == vessel_id).all()
 
 
 def create_coordinate(db: Session, coordinate: schemas.CoordinateCreate):
@@ -20,7 +20,3 @@ def create_coordinate(db: Session, coordinate: schemas.CoordinateCreate):
     db.refresh(db_coordinate)
 
     return db_coordinate
-
-
-def get_vessel(db: Session, vessel_id: int):
-    return db.query(models.Vessel).filter(models.Vessel.id == vessel_id).first()

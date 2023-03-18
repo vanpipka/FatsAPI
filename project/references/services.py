@@ -42,3 +42,7 @@ def create_vessel(db: Session, vessel: schemas.VesselCreate):
     db.refresh(db_vessel)
 
     return db_vessel
+
+
+def get_vessels(db: Session, skip: int = 10, limit: int = 100):
+    return db.query(models.Vessel).offset(skip).limit(limit).all()

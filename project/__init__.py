@@ -16,6 +16,9 @@ def create_app() -> FastAPI:
     from project.references import references_router
     app.include_router(references_router)
 
+    from project.locations import locations_router
+    app.include_router(locations_router)
+
 
     @app.get("/")
     async def root():
