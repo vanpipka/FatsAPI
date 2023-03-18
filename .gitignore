@@ -1,2 +1,7 @@
-database.db
+db.sqlite3
 secrets.py
+.idea/
+.git/
+.env/
+venv
+
