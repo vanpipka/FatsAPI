@@ -6,7 +6,6 @@ from celery.utils.log import get_task_logger
 from project.database import db_context
 import asyncio
 
-
 logger = get_task_logger(__name__)
 
 
@@ -18,12 +17,12 @@ def test_task():
 
 
 @shared_task
-def download_marine_traffic_vessel_id(imo: str):
+def download_vessel_coordinate(marine_traffic_id: str):
 
-    if not imo:
+    if not marine_traffic_id:
         return
 
-    from project.locations.parsers.marine_traffic.get_marine_traffic_id import run_tasks
-    asyncio.run(run_tasks([imo]))
+    from project.locations.parsers.marine_traffic.get_last_coordinate import run_tasks
+    asyncio.run(run_tasks([marine_traffic_id]))
 
 

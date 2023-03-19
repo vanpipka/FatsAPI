@@ -30,6 +30,7 @@ class VesselCreate(_VesselBase):
 class Vessel(_VesselBase):
     id: int
     mmsi: str
+    marine_traffic_id: str
 
     class Config:
         orm_mode = True

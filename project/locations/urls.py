@@ -29,6 +29,23 @@ def create_coordinate(coordinate: schemas.CoordinateCreate, db: Session = Depend
     return services.create_coordinate(db=db, coordinate=coordinate)
 
 
+@locations_router.post("/coordinates/download/{vessel_id}", response_model=schemas.Vessel)
+def download_coordinate_for_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
+
+    from project.references.services import get_vessel
+    from .tasks import download_vessel_coordinate
+
+    db_vessel = get_vessel(db=db, vessel_id=vessel_id)
+    if not db_vessel:
+        raise HTTPException(
+            status_code=400, detail="vessel does not exists"
+        )
+
+    download_vessel_coordinate.delay(db_vessel.marine_traffic_id)
+
+    return db_vessel
+
+
 @locations_router.get("/coordinates/{vessel_id}", response_model=List[schemas.Coordinate])
 def read_coordinates_for_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
 

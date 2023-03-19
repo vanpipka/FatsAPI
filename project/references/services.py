@@ -36,10 +36,14 @@ def get_vessel_by_imo(db: Session, vessel_imo: str):
 
 def create_vessel(db: Session, vessel: schemas.VesselCreate):
 
+    from .tasks import download_marine_traffic_vessel_id
+
     db_vessel = models.Vessel(name=vessel.name, imo=vessel.imo)
     db.add(db_vessel)
     db.commit()
     db.refresh(db_vessel)
+
+    download_marine_traffic_vessel_id.delay(vessel.imo)
 
     return db_vessel
 

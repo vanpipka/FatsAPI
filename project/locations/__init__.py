@@ -4,4 +4,4 @@ locations_router = APIRouter(
     prefix="/locations",
 )
 
-from . import urls, models
+from . import urls, models, tasks

@@ -78,3 +78,18 @@ def read_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
         )
     return db_vessel
 
+
+@references_router.get("/vessels/refresh_vessel_info/{vessel_id}", response_model=schemas.Vessel)
+def refresh_vessel_info(vessel_id: int, db: Session = Depends(get_db_session)):
+
+    from .tasks import download_marine_traffic_vessel_id
+    db_vessel = services.get_vessel(db=db, vessel_id=vessel_id)
+    if db_vessel is None:
+        raise HTTPException(
+            status_code=404, detail="sorry this vessel does not exists"
+        )
+
+    download_marine_traffic_vessel_id.delay(db_vessel.imo)
+
+    return db_vessel
+

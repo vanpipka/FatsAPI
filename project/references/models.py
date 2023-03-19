@@ -14,7 +14,6 @@ class User(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
 
-
     def __init__(self, name, email, hashed_password, *args, **kwargs):
         self.name = name
         self.email = email
@@ -31,6 +30,7 @@ class Vessel(Base):
     name = Column(String, default="")
     imo = Column(String, unique=True, index=True, default="")
     mmsi = Column(String, default="")
+    marine_traffic_id = Column(String, default="")
 
     coordinates = relationship("Coordinate", back_populates="vessel")
 
