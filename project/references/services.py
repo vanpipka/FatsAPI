@@ -50,3 +50,7 @@ def create_vessel(db: Session, vessel: schemas.VesselCreate):
 
 def get_vessels(db: Session, skip: int = 10, limit: int = 100):
     return db.query(models.Vessel).offset(skip).limit(limit).all()
+
+
+def get_vessels_on_tracking(db: Session):
+    return db.query(models.Vessel).filter(models.Vessel.marine_traffic_id != "").all()

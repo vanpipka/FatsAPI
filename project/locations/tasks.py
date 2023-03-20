@@ -1,5 +1,6 @@
 import random
 import logging
+from typing import List
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -26,3 +27,28 @@ def download_vessel_coordinate(marine_traffic_id: str):
     asyncio.run(run_tasks([marine_traffic_id]))
 
 
+@shared_task
+def download_vessels_coordinate() -> dict:
+
+    from project.locations.parsers.marine_traffic.get_last_coordinate import run_tasks
+    from project.references.services import get_vessels_on_tracking
+
+    with db_context() as session:
+        vessels = get_vessels_on_tracking(session)
+        if not vessels:
+            return {"result": "no objects to process"}
+
+    marine_traffic_ids = []
+
+    for vessel in vessels:
+
+        marine_traffic_ids.append(vessel.marine_traffic_id)
+
+        if len(marine_traffic_ids) == 50:
+            asyncio.run(run_tasks(marine_traffic_ids))
+            marine_traffic_ids = []
+
+    if len(marine_traffic_ids) > 0:
+        asyncio.run(run_tasks(marine_traffic_ids))
+
+    return {"result": f"started for {len(vessels)} objects"}

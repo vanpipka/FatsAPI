@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+import datetime
 
+from fastapi import FastAPI
+from celery.schedules import crontab
 from project.config import settings
 
 
@@ -19,9 +21,13 @@ def create_app() -> FastAPI:
     from project.locations import locations_router
     app.include_router(locations_router)
 
-
     @app.get("/")
     async def root():
         return {"message": "Hello World"}
 
+    @app.celery_app.task
+    def test():
+        return datetime.datetime.now()
+
     return app
+

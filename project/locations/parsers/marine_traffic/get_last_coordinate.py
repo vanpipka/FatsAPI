@@ -86,6 +86,7 @@ async def run_tasks(vessels: List[str]):
         task = asyncio.create_task(vessel_id_scrapper.scrape())
         tasks.append(task)
 
+    logger.info(f"run_tasks {(',').join(vessels)}")
     await asyncio.gather(*tasks)
 
 
