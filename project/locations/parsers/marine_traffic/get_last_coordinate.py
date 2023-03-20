@@ -74,7 +74,9 @@ class MarineTrafficCoordinateScrapper:
 
         async with aiohttp.ClientSession(headers=MARINE_TRAFFIC_HEADERS) as session:
             async with session.get(self.url) as resp:
-                self.result = get_json_from_string(await resp.text())
+
+                body = await resp.text()
+                self.result = get_json_from_string(body)
                 await self.__save()
 
 
