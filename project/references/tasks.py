@@ -27,3 +27,12 @@ def download_marine_traffic_vessel_id(imo: str):
     asyncio.run(run_tasks([imo]))
 
 
+@shared_task
+def refresh_vessel_info_from_marine_traffic(marine_traffic_id: str):
+
+    if not marine_traffic_id:
+        return
+
+    from project.locations.parsers.marine_traffic.refresh_vessel_data import run_tasks
+    asyncio.run(run_tasks([marine_traffic_id]))
+

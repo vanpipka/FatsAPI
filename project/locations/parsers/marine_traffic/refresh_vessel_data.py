@@ -4,34 +4,34 @@ from json import JSONDecodeError
 from typing import List, Union
 
 import aiohttp
-from datetime import datetime
-
 from celery.utils.log import get_task_logger
 
 from project.database import db_context
 from project.references.schemas import Vessel
 from project.references.models import Vessel as VesselModel
-from .schemas import Position, Error
+
+from .schemas import VesselInfo, Error
 from .headers import MARINE_TRAFFIC_HEADERS
 
-SEARCH_STRING = "https://www.marinetraffic.com/vesselDetails/latestPosition/shipid:"
+SEARCH_STRING = "https://www.marinetraffic.com/en/vesselDetails/vesselInfo/shipid:"
 logger = get_task_logger(__name__)
 
 
-def get_json_from_string(body: str) -> Union[Position, Error]:
+def get_json_from_string(body: str) -> Union[VesselInfo, Error]:
     try:
         data = json.loads(body)
+
     except JSONDecodeError as error:
         return Error(error=True, error_text=error.msg)
 
-    result = Position(**data)
+    result = VesselInfo(**data)
     return result
 
 
-class MarineTrafficCoordinateScrapper:
+class MarineTrafficDataScrapper:
     vessel: Vessel
     url: str
-    result: Position
+    result: VesselInfo
 
     def __init__(self, marine_traffic_id: str):
 
@@ -47,9 +47,6 @@ class MarineTrafficCoordinateScrapper:
 
     async def __save(self):
 
-        from project.locations.schemas import CoordinateCreate
-        from project.locations.services import create_coordinate
-
         if self.result.error:
             logger.info(f"vessel with marine_traffic_id:{self.marine_traffic_id} has error: {self.result.error_text}")
             return
@@ -57,15 +54,20 @@ class MarineTrafficCoordinateScrapper:
             logger.info(f"vessel with marine_traffic_id:{self.marine_traffic_id} does not exists")
             return
 
+        from project.locations.services import get_or_create_country
+        from project.locations.schemas import CountryCreate
+
         with db_context() as session:
 
-            coordinate = CoordinateCreate(latitude=self.result.lat,
-                                          longitude=self.result.lon,
-                                          date=datetime.utcfromtimestamp(self.result.lastPos),
-                                          vessel_id=self.vessel.id,
-                                          area=self.result.areaName)
+            country = get_or_create_country(session, country=CountryCreate(name=self.result.country,
+                                                                           code=self.result.countryCode))
 
-            create_coordinate(db=session, coordinate=coordinate)
+            if self.vessel.mmsi != self.result.mmsi or self.vessel.country_id != country.id:
+                self.vessel.mmsi = self.result.mmsi
+                self.vessel.country_id = country.id
+
+                with db_context() as session:
+                    self.vessel.save(db=session)
 
     async def scrape(self):
 
@@ -75,9 +77,7 @@ class MarineTrafficCoordinateScrapper:
 
         async with aiohttp.ClientSession(headers=MARINE_TRAFFIC_HEADERS) as session:
             async with session.get(self.url) as resp:
-
                 body = await resp.text()
-                print(body)
                 self.result = get_json_from_string(body)
                 await self.__save()
 
@@ -85,14 +85,12 @@ class MarineTrafficCoordinateScrapper:
 async def run_tasks(vessels: List[str]):
     tasks = []
 
-    for marine_traffic_id in vessels:
-        vessel_id_scrapper = MarineTrafficCoordinateScrapper(marine_traffic_id)
+    for imo in vessels:
+        vessel_id_scrapper = MarineTrafficDataScrapper(imo)
         task = asyncio.create_task(vessel_id_scrapper.scrape())
         tasks.append(task)
 
-    logger.info(f"run_tasks {(',').join(vessels)}")
     await asyncio.gather(*tasks)
 
-
 # loop = asyncio.get_event_loop()
-# loop.run_until_complete(run_tasks(["459282"]))
+# loop.run_until_complete(run_tasks(["9380075"]))

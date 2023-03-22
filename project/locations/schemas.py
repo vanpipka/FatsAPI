@@ -8,6 +8,7 @@ class _CoordinateBase(BaseModel):
     longitude: str
     date: datetime
     vessel_id: int
+    area: str
 
 
 class CoordinateCreate(_CoordinateBase):
@@ -21,15 +22,39 @@ class Coordinate(_CoordinateBase):
         orm_mode = True
 
 
-class _VesselBase(BaseModel):
+class _RouteBase(BaseModel):
+
+    container_id: int
+    start_place: str
+    start_date: datetime
+    end_place: str
+    end_date: datetime
+
+
+class RouteCreate(_RouteBase):
+    pass
+
+
+class Route(_RouteBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class _CountryBase(BaseModel):
 
     name: str
-    imo: str
+    code: str
 
 
-class Vessel(_VesselBase):
+class \
+        CountryCreate(_CountryBase):
+    pass
+
+
+class Country(_CountryBase):
     id: int
-    mmsi: str
 
     class Config:
         orm_mode = True

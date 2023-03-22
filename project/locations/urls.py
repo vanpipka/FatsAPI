@@ -14,6 +14,7 @@ from .models import Coordinate
 from project.database import get_db_session
 
 from . import schemas, services
+from project.references.schemas import Vessel as VesselScheme
 
 
 @locations_router.post("/coordinates/", response_model=schemas.Coordinate)
@@ -29,7 +30,7 @@ def create_coordinate(coordinate: schemas.CoordinateCreate, db: Session = Depend
     return services.create_coordinate(db=db, coordinate=coordinate)
 
 
-@locations_router.post("/coordinates/download/{vessel_id}", response_model=schemas.Vessel)
+@locations_router.post("/coordinates/download/{vessel_id}", response_model=VesselScheme)
 def download_coordinate_for_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
 
     from project.references.services import get_vessel
@@ -52,3 +53,24 @@ def read_coordinates_for_vessel(vessel_id: int, db: Session = Depends(get_db_ses
     coordinates = services.get_coordinates_for_vessel(db=db, vessel_id=vessel_id)
 
     return coordinates
+
+
+@locations_router.get("/routes/{container_id}", response_model=List[schemas.Route])
+def read_routes_for_container(container_id: int, db: Session = Depends(get_db_session)):
+
+    routes = services.get_routes_for_container(db=db, container_id=container_id)
+
+    return routes
+
+
+@locations_router.post("/routes/", response_model=schemas.Route)
+def create_route(route: schemas.RouteCreate, db: Session = Depends(get_db_session)):
+
+    from project.references.services import get_container
+
+    db_container = get_container(db=db, container_id=route.container_id)
+    if not db_container:
+        raise HTTPException(
+            status_code=400, detail="container does not exists"
+        )
+    return services.create_route(db=db, route=route)

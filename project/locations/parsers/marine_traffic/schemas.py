@@ -31,8 +31,12 @@ class Position(Error):
     lat: float
     areaName: str
     lastPos: int
-    departurePort: Port
-    arrivalPort: Port
+
+
+class VesselInfo(Error):
+    country: str
+    countryCode: str
+    mmsi: str
 
 
 

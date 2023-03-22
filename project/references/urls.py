@@ -69,6 +69,16 @@ def read_vessels(
     return vessels
 
 
+@references_router.get("/vessels/list/", response_model=List[schemas.VesselList])
+def read_vessels(
+        skip: int = 0,
+        limit: int = 10,
+        db: Session = Depends(get_db_session)):
+    vessels = services.get_vessels_list(db=db, skip=skip, limit=limit)
+
+    return vessels
+
+
 @references_router.get("/vessels/{vessel_id}", response_model=schemas.Vessel)
 def read_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
     db_vessel = services.get_vessel(db=db, vessel_id=vessel_id)
@@ -82,14 +92,46 @@ def read_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
 @references_router.get("/vessels/refresh_vessel_info/{vessel_id}", response_model=schemas.Vessel)
 def refresh_vessel_info(vessel_id: int, db: Session = Depends(get_db_session)):
 
-    from .tasks import download_marine_traffic_vessel_id
+    from .tasks import refresh_vessel_info_from_marine_traffic
     db_vessel = services.get_vessel(db=db, vessel_id=vessel_id)
     if db_vessel is None:
         raise HTTPException(
             status_code=404, detail="sorry this vessel does not exists"
         )
 
-    download_marine_traffic_vessel_id.delay(db_vessel.imo)
+    refresh_vessel_info_from_marine_traffic.delay(db_vessel.marine_traffic_id)
 
     return db_vessel
 
+
+@references_router.post("/containers/", response_model=schemas.Container)
+def create_container(
+        container: schemas.ContainerCreate, db: Session = Depends(get_db_session)):
+
+    db_container = services.get_container_by_name(db=db, name=container.name)
+    if db_container:
+        raise HTTPException(
+            status_code=400, detail="woops the already used"
+        )
+    return services.create_container(db=db, container=container)
+
+
+@references_router.get("/containers/", response_model=List[schemas.Container])
+def read_containers(
+        skip: int = 0,
+        limit: int = 10,
+        db: Session = Depends(get_db_session)):
+
+    containers = services.get_containers(db=db, skip=skip, limit=limit)
+
+    return containers
+
+
+@references_router.get("/containers/{container_id}", response_model=schemas.Container)
+def read_container(container_id: int, db: Session = Depends(get_db_session)):
+    db_container = services.get_container(db=db, container_id=container_id)
+    if db_container is None:
+        raise HTTPException(
+            status_code=404, detail="sorry this container does not exists"
+        )
+    return db_container
