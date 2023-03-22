@@ -1,9 +1,5 @@
-import random
-import logging
-
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from project.database import db_context
 import asyncio
 
 

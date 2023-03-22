@@ -1,9 +1,10 @@
 from fastapi import Depends
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.orm import relationship
 
-from project.database import Base, get_db_session
+from project.database import Base
 from project.models_utils import ReferenceMixin
+# import project.locations.models as locations_models
 
 
 class User(Base, ReferenceMixin):
@@ -24,8 +25,6 @@ class User(Base, ReferenceMixin):
 
 class Vessel(Base, ReferenceMixin):
 
-    from project.locations.models import Coordinate, Country
-
     __tablename__ = "vessels"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -44,8 +43,6 @@ class Vessel(Base, ReferenceMixin):
 
 
 class Container(Base, ReferenceMixin):
-
-    from project.locations.models import Route
 
     __tablename__ = "containers"
 

@@ -1,5 +1,19 @@
+from typing import Optional
+
 from pydantic import BaseModel
 from datetime import datetime
+
+
+class _AreaBase(BaseModel):
+
+    name: str
+
+
+class Area(_AreaBase):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
 class _CoordinateBase(BaseModel):
@@ -8,7 +22,7 @@ class _CoordinateBase(BaseModel):
     longitude: str
     date: datetime
     vessel_id: int
-    area: str
+    area_id: Optional[int]
 
 
 class CoordinateCreate(_CoordinateBase):
@@ -17,6 +31,7 @@ class CoordinateCreate(_CoordinateBase):
 
 class Coordinate(_CoordinateBase):
     id: int
+    area: Optional[Area]
 
     class Config:
         orm_mode = True
@@ -48,8 +63,7 @@ class _CountryBase(BaseModel):
     code: str
 
 
-class \
-        CountryCreate(_CountryBase):
+class CountryCreate(_CountryBase):
     pass
 
 

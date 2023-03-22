@@ -1,7 +1,9 @@
 from typing import List, Optional
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
+
+import project.locations.schemas as locations_schemas
 
 
 class _UserBase(BaseModel):
@@ -32,12 +34,10 @@ class VesselCreate(_VesselBase):
 
 class Vessel(_VesselBase):
 
-    # import project.locations.schemas as locations_schema
-
     id: int
     mmsi: str
     marine_traffic_id: str
-    # country: Optional[locations_schema.Country]
+    country: Optional[locations_schemas.Country]
 
     class Config:
         orm_mode = True
@@ -46,6 +46,7 @@ class Vessel(_VesselBase):
 class VesselList(Vessel):
 
     area: str
+    country_code: str
     refresh_date: datetime
 
     class Config:
@@ -61,10 +62,9 @@ class ContainerCreate(_ContainerBase):
 
 
 class Container(_ContainerBase):
-    from project.locations.schemas import Route as RouteSchema
 
     id: int
-    routes: List[RouteSchema]
+    routes: List[locations_schemas.Route]
 
     class Config:
         orm_mode = True

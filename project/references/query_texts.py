@@ -2,7 +2,8 @@ VESSELS_LIST = "SELECT" \
                "    vessels.name as name, " \
                "    vessels.id as id, " \
                "    vessels.imo as imo, " \
-               "    vessels.mmsi as mmsi, " \
+               "    vessels.mmsi as mmsi, "\
+               "    COALESCE(countries.code, 'af') as country_code, "\
                "    vessels.marine_traffic_id as marine_traffic_id, "\
                "    COALESCE(areas.name, '') as area, " \
                "    COALESCE(max_date_coordinates.date, '0001-01-01 00:00:00.000') as refresh_date "\
@@ -19,4 +20,7 @@ VESSELS_LIST = "SELECT" \
                "        AND last_coorfinates.date = max_date_coordinates.date" \
                "    LEFT JOIN " \
                "        areas as areas " \
-               "    ON areas.id = last_coorfinates.area_id "
+               "    ON areas.id = last_coorfinates.area_id " \
+               "    LEFT JOIN " \
+               "        countries as countries " \
+               "    ON countries.id = vessels.country_id "

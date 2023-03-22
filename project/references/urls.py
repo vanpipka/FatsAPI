@@ -1,12 +1,6 @@
-import logging
-import random
-from string import ascii_lowercase
 from typing import List
 
-from celery.result import AsyncResult
 from fastapi import Depends, HTTPException
-from fastapi.responses import JSONResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from . import references_router

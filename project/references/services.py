@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session, aliased
-from sqlalchemy import select, and_, literal_column, join, func, text
+from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from . import models, schemas
 
@@ -73,17 +73,9 @@ def get_containers(db: Session, skip: int = 10, limit: int = 100):
 
 
 def get_vessels_list(db: Session, skip: int = 10, limit: int = 100):
-    from project.locations.models import Coordinate, Area
+
     from .query_texts import VESSELS_LIST
-
-    vessels = get_vessels(db, skip, limit)
-
-    vessels_ids = [i.id for i in vessels]
-
     data = list(db.execute(text(VESSELS_LIST)))
-
-    for i in data:
-        print(i.name)
 
     return data
 
