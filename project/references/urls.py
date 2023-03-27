@@ -65,14 +65,20 @@ def read_vessels(
     return vessels
 
 
-@references_router.get("/vessels/list/", response_model=List[schemas.VesselList])
+@references_router.get("/vessels_list/", response_model=List[schemas.VesselList])
 def read_vessels(
         skip: int = 0,
-        limit: int = 10,
-        db: Session = Depends(get_db_session)):
+        limit: int = 10, db: Session = Depends(get_db_session)):
     vessels = services.get_vessels_list(db=db, skip=skip, limit=limit)
 
     return vessels
+
+
+@references_router.get("/vessels_list/{vessel_id}", response_model=schemas.VesselList)
+def read_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
+    vessel = services.get_vessel_info_for_list(db=db, vessel_id=vessel_id)
+
+    return vessel
 
 
 @references_router.get("/vessels/{vessel_id}", response_model=schemas.Vessel)

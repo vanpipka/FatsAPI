@@ -80,5 +80,16 @@ def get_vessels_list(db: Session, skip: int = 10, limit: int = 100):
     return data
 
 
+def get_vessel_info_for_list(db: Session, vessel_id: int):
+
+    from .query_texts import VESSELS_LIST
+    data = db.execute(text(f"{VESSELS_LIST} WHERE vessels.id = {vessel_id}")).mappings().all()
+
+    if len(data) > 0:
+        return data[0]
+
+    return {}
+
+
 def get_container_by_name(db: Session, name: str):
     return db.query(models.Container).filter(models.Container.name == name).first()
