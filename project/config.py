@@ -32,6 +32,7 @@ class BaseConfig:
     }
 
     CELERY_TASK_DEFAULT_QUEUE: str = "default"
+    CELERY_RESULT_EXTENDED: bool = True
 
     # Force all queues to be explicitly listed in `CELERY_TASK_QUEUES` to help prevent typos
     CELERY_TASK_CREATE_MISSING_QUEUES: bool = False

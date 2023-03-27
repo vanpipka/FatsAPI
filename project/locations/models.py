@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 
 from project.database import Base
 
-from project.models_utils import ReferenceMixin
+from project.common.models import ReferenceMixin
 
 
 class Country(Base, ReferenceMixin):

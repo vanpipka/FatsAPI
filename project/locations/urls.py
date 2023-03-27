@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import logging
 import random
 from string import ascii_lowercase
@@ -15,7 +15,7 @@ from project.database import get_db_session
 
 from . import schemas, services
 
-import project.schemas as project_schemas
+import project.common.schemas as common_schemas
 
 
 @locations_router.post("/coordinates/", response_model=schemas.Coordinate)
@@ -29,7 +29,7 @@ def create_coordinate(coordinate: schemas.CoordinateCreate, db: Session = Depend
     return services.create_coordinate(db=db, coordinate=coordinate)
 
 
-@locations_router.post("/coordinates/download/{vessel_id}", response_model=project_schemas.Task)
+@locations_router.post("/coordinates/download/{vessel_id}", response_model=common_schemas.Task)
 def download_coordinate_for_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
 
     from project.references.services import get_vessel
@@ -43,7 +43,7 @@ def download_coordinate_for_vessel(vessel_id: int, db: Session = Depends(get_db_
 
     celery_task = download_vessel_coordinate.delay(db_vessel.marine_traffic_id)
 
-    return project_schemas.Task(id=str(celery_task.id), date=datetime.datetime.now())
+    return common_schemas.Task(id=celery_task.id)
 
 
 @locations_router.get("/coordinates/{vessel_id}", response_model=List[schemas.Coordinate])

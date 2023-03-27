@@ -34,13 +34,12 @@ def create_app() -> FastAPI:
     from project.locations import locations_router
     app.include_router(locations_router)
 
+    from project.common import common_router
+    app.include_router(common_router)
+
     @app.get("/")
     async def root():
         return {"message": "Hello World"}
-
-    @app.celery_app.task
-    def test():
-        return datetime.datetime.now()
 
     return app
 

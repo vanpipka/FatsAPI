@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from fastapi import Depends, HTTPException
@@ -7,6 +8,7 @@ from . import references_router
 from project.database import get_db_session
 
 from . import schemas, services
+import project.common.schemas as common_schemas
 
 
 @references_router.post("/users/", response_model=schemas.User)
@@ -83,7 +85,7 @@ def read_vessel(vessel_id: int, db: Session = Depends(get_db_session)):
     return db_vessel
 
 
-@references_router.get("/vessels/refresh_vessel_info/{vessel_id}", response_model=schemas.Vessel)
+@references_router.get("/vessels/refresh_vessel_info/{vessel_id}", response_model=common_schemas.Task)
 def refresh_vessel_info(vessel_id: int, db: Session = Depends(get_db_session)):
 
     from .tasks import refresh_vessel_info_from_marine_traffic
@@ -93,9 +95,9 @@ def refresh_vessel_info(vessel_id: int, db: Session = Depends(get_db_session)):
             status_code=404, detail="sorry this vessel does not exists"
         )
 
-    refresh_vessel_info_from_marine_traffic.delay(db_vessel.marine_traffic_id)
+    celery_task = refresh_vessel_info_from_marine_traffic.delay(db_vessel.marine_traffic_id)
 
-    return db_vessel
+    return common_schemas.Task(id=celery_task.id)
 
 
 @references_router.post("/containers/", response_model=schemas.Container)
