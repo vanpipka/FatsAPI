@@ -27,10 +27,11 @@ class BaseConfig:
     CELERY_BEAT_SCHEDULE: dict = {
         "task-schedule-work": {
             "task": "project.locations.tasks.download_vessels_coordinate",
-            "schedule": 300.0,  # five seconds
+            "schedule": 1800.0,  # 30 min
         },
     }
 
+    CELERY_BEAT_MAX_LOOP_INTERVAL: int = 1800
     CELERY_TASK_DEFAULT_QUEUE: str = "default"
     CELERY_RESULT_EXTENDED: bool = True
 

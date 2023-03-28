@@ -22,10 +22,10 @@ class _CoordinateBase(BaseModel):
     longitude: str
     date: datetime
     vessel_id: int
-    area_id: Optional[int]
 
 
 class CoordinateCreate(_CoordinateBase):
+    area: str
     pass
 
 
